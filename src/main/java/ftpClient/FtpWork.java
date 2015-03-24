@@ -2,10 +2,12 @@ package ftpClient;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Properties;
 import java.util.Scanner;
 
 import org.apache.commons.net.ftp.FTPClient;
@@ -13,6 +15,7 @@ import org.apache.commons.net.ftp.FTPFile;
 import org.apache.commons.net.ftp.FTPReply;
 
 public class FtpWork {
+	static Properties property = new Properties();
 	public  void printComandInform() {
 		System.out.println("================================");
 		System.out.println("Information about functions of program: ");
@@ -27,6 +30,17 @@ public class FtpWork {
 		currentName = scanner.nextLine();
 		return currentName;
 	}
+	public static void loadProperty(){
+		
+	    try{
+	    	FileInputStream file = new FileInputStream("src/main/java/ftpClient/resource/config.properties");
+	    	property.load(file);
+	    	
+	    }catch(IOException fn){
+	    	System.out.println("Not find config.properties");
+	    }
+	}
+	
 	public  boolean isDirectory(FTPClient ftpClient, String parentDir) throws IOException{
 		int cntInnerFiles = 0;;
 		FTPFile[] subFiles = ftpClient.listFiles(parentDir);
@@ -64,10 +78,11 @@ public class FtpWork {
 		}
 	}
 	public  void connectToFtp(FTPClient ftpClient) throws IOException {
-		String server = "ftp.mozilla.org";
-		int port = 21;
-		String user = "anonymous";
-		String pass = "123";
+		loadProperty();
+		String server = property.getProperty("server");
+		int port = Integer.parseInt(property.getProperty("port"));
+		String user = property.getProperty("user");
+		String pass = property.getProperty("pass");
 		ftpClient.connect(server, port);
 		int replyCode = ftpClient.getReplyCode();
 		if (!FTPReply.isPositiveCompletion(replyCode)) {
@@ -83,17 +98,19 @@ public class FtpWork {
 	}
 	@SuppressWarnings("unused")
 	public  void downloadFileFromFtp(FTPClient ftpClient, String path,
-			String currentName, String directoryOfSavingFile)
+			String currentName)
 			throws IOException {
+		
 		final int partStream = 4096;
 		String remoteFile1 = path.substring(0, path.length() - 1);
-		File downloadFile1 = new File(directoryOfSavingFile + currentName);
+		File downloadFile1 = new File(currentName);
 		OutputStream outputStream2 = new BufferedOutputStream(
 				new FileOutputStream(downloadFile1));
 		InputStream inputStream = ftpClient.retrieveFileStream(remoteFile1);
 		byte[] bytesArray = new byte[partStream];
 		int bytesRead = -1;
 		System.out.println("Load of " + currentName + "...");
+		
 		while ((bytesRead = inputStream.read(bytesArray)) != -1) {
 			outputStream2.write(bytesArray, 0, bytesRead);
 		}

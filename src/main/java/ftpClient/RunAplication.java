@@ -1,38 +1,24 @@
 package ftpClient;
 
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.Properties;
 import java.util.zip.ZipOutputStream;
 
 import org.apache.commons.net.ftp.FTPClient;
 
 
 public class RunAplication {
-	static Properties property = new Properties();
-	public static void loadProperty(){
-		
-	    try{
-	    	FileInputStream file = new FileInputStream("src/main/java/ftpClient/resource/config.properties");
-	    	property.load(file);
-	    	
-	    }catch(IOException fn){
-	    	System.out.println("Not find config.properties");
-	    }
-	}
 	
-	@SuppressWarnings({ "unused", "static-access" })
+
+	@SuppressWarnings({  "static-access" })
 	public static void main(String[] args) throws IOException{
 		
-		FileOutputStream fos = new FileOutputStream("Output.zip");
+		FileOutputStream fos = new FileOutputStream("Output.zip",true);
 		ZipOutputStream zos = new ZipOutputStream(fos);
 		
 		FtpWork ftp = new FtpWork();
 		FTPClient ftpClient = new FTPClient();
 		ZipArch zip = new ZipArch();
-		loadProperty();
-		String directoryOfSavingFile = property.getProperty("OutputFolder");
 		ftp.printComandInform();
 		
 		try {
@@ -46,10 +32,11 @@ public class RunAplication {
 					System.out.println(currentName + " " + path);
 					ftp.listDirectory(ftpClient, path, "");
 				} else {
-					ftp.downloadFileFromFtp(ftpClient, path, currentName, directoryOfSavingFile);
+					ftp.downloadFileFromFtp(ftpClient, path, currentName);
 					zip.addToZipFile(currentName, zos);
+					break;
 				}
-			} while (!currentName.equals("exit"));
+			} while (!currentName.equals("Exit"));
 		}  finally {
 			ftp.disconnectFromFtp(ftpClient);
 		}
