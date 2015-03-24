@@ -4,6 +4,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.zip.ZipOutputStream;
 
+import javax.swing.JFrame;
+
 import org.apache.commons.net.ftp.FTPClient;
 
 
@@ -12,7 +14,8 @@ public class RunAplication {
 
 	@SuppressWarnings({  "static-access" })
 	public static void main(String[] args) throws IOException{
-		
+		JFrame frame = new JFrame("Test frame");
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		FileOutputStream fos = new FileOutputStream("Output.zip",true);
 		ZipOutputStream zos = new ZipOutputStream(fos);
 		
